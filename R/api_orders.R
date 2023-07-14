@@ -22,40 +22,41 @@
 #' @param page_size (int) for get_order_history, refers to the number of historical records to return
 #' @import httr magrittr
 #' @export
-api_orders <- function (RH, action, status_url = NULL, cancel_url = NULL, instrument_id = NULL, 
-                        symbol = NULL, type = NULL, time_in_force = NULL, trigger = NULL, 
-                        price = NULL, stop_price = NULL, quantity = NULL, notional = NULL, 
+api_orders <- function (RH, action, status_url = NULL, cancel_url = NULL, instrument_id = NULL,
+                        symbol = NULL, type = NULL, time_in_force = NULL, trigger = NULL,
+                        price = NULL, stop_price = NULL, quantity = NULL, notional = NULL,
                         currency = 'USD', side = NULL, page_size = NULL) {
   if (action == "order") {
     url <- RobinHood::api_endpoints("orders")
     token <- paste("Bearer", RH$api_response.access_token)
 
     if (is.na(notional)) {
-      detail <- list(account = RH$url.account_id, instrument = instrument_id, 
-                     symbol = symbol, type = type, time_in_force = time_in_force, 
-                     trigger = trigger, price = price, stop_price = stop_price, 
-                     quantity = quantity, side = side, client_id = RH$api_request.client_id)
-      
+      detail <- list(account = RH$url.account_id, instrument = instrument_id,
+                     order_form_version = 4,
+                     symbol = symbol, type = type, time_in_force = time_in_force,
+                     trigger = trigger, price = price, stop_price = stop_price,
+                     quantity = as.character(quantity), side = side, client_id = RH$api_request.client_id)
+
       if (trigger == "immediate") {
         detail <- detail[c("account", "instrument", "symbol", "type", "time_in_force",
                              "trigger", "price", "quantity", "side", "client_id")]
       }
-      
+
     } else {
 
-      detail <- list(account = RH$url.account_id, instrument = instrument_id, 
+      detail <- list(account = RH$url.account_id, instrument = instrument_id,
                      order_form_version = 4,
-                     symbol = symbol, type = "market", time_in_force = 'gfd', 
-                     trigger = "immediate", price = price, #stop_price = stop_price, 
-                     dollar_based_amount = list(amount = as.character(round(notional,2)), 
+                     symbol = symbol, type = "market", time_in_force = 'gfd',
+                     trigger = "immediate", price = price, #stop_price = stop_price,
+                     dollar_based_amount = list(amount = as.character(round(notional,2)),
                                                 currency_code = currency),
                      side = side, client_id = RH$api_request.client_id)
-      
+
     }
-    dta <- httr::POST(url = url, 
-                      add_headers("Accept" = "application/json", 
-                                  "Content-Type" = "application/json", 
-                                  "Authorization" = token), 
+    dta <- httr::POST(url = url,
+                      add_headers("Accept" = "application/json",
+                                  "Content-Type" = "application/json",
+                                  "Authorization" = token),
                       body = toJSON(detail, auto_unbox = TRUE))
 
     httr::stop_for_status(dta)
