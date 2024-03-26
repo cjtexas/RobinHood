@@ -66,3 +66,38 @@ get_market_hours <- function(RH, market_date = NULL, tz = Sys.timezone()) {
 
     return(markets)
 }
+
+
+
+
+
+
+
+#' Get NYSE Hours
+#'
+#' Get NYSE Hours in New York Hours - Forced to be NYSE to accommodate Robinhood error
+#'
+#' @param RH object of class RobinHood
+#' @param market_date (string) date in the form 'yyyy-mm-dd', default today
+#' @import httr magrittr dplyr lubridate
+#' @export
+#' @examples
+#' \dontrun{
+#' # Login in to your RobinHood account
+#' RH <- RobinHood("username", "password")
+#'
+#' get_nyse(RH)
+#'}
+get_nyse = function(RH, market_date = Sys.Date()){
+  nyse_url = paste0('https://api.robinhood.com/markets/ARCX/hours/',Sys.Date())
+  token <- paste("Bearer", RH$api_response.access_token)
+  dta <- GET(nyse_url, add_headers(Accept = "application/json",
+                                   `Content-Type` = "application/json", Authorization = token))
+  hrs = as_tibble(content(dta)) %>%
+    dplyr::mutate_at(c("opens_at", "closes_at", "extended_opens_at", "extended_closes_at"),
+                     function(x) lubridate::with_tz(lubridate::ymd_hms(x), tzone = "America/New_York")) %>%
+    mutate(date = as.Date(date))
+
+  return(hrs)
+}
+
