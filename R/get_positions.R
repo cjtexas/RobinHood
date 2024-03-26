@@ -19,31 +19,32 @@ get_positions <- function(RH, limit_output = TRUE) {
     # Get current positions
     positions <- RobinHood::api_positions(RH)
 
-    ### Commented out on 3/26/2024 when Robinhood updated API to include Symbol
-    # # Use instrument IDs to get the ticker symbol and name
-    # instrument_id <- positions$instrument
-    # instruments <- c()
-    #
-    # # For each instrument id, get stocker symbols and names
-    # for (inst in instrument_id) {
-    #   instrument <- RobinHood::api_instruments(RH, instrument_url = inst)
-    #
-    #   # If any simple names are blank, use full name
-    #   x <- data.frame(simple_name = ifelse(is.null(instrument$simple_name),
-    #                                                instrument$name,
-    #                                                instrument$simple_name),
-    #                                        symbol = instrument$symbol)
-    #
-    #   instruments <- rbind(instruments, x)
-    # }
-    #
-    # # If No positions, return empty DF
-    # if(length(instrument_id)==0){
-    #   instruments = stats::setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("simple_name", "symbol"))
-    # }
-    #
-    # # Combine positions with instruments
-    # positions <- cbind(instruments, positions)
+
+    # Use instrument IDs to get the ticker symbol and name
+    instrument_id <- positions$instrument
+    instruments <- c()
+
+    # For each instrument id, get stocker symbols and names
+    for (inst in instrument_id) {
+      instrument <- RobinHood::api_instruments(RH, instrument_url = inst)
+
+      # If any simple names are blank, use full name
+      x <- data.frame(simple_name = ifelse(is.null(instrument$simple_name),
+                                                   instrument$name,
+                                                   instrument$simple_name),
+                                           symbol = instrument$symbol)
+
+      instruments <- rbind(instruments, x)
+    }
+
+    # If No positions, return empty DF
+    if(length(instrument_id)==0){
+      instruments = stats::setNames(data.frame(matrix(ncol = 2, nrow = 0)), c("simple_name", "symbol"))
+    }
+
+    ### 3/26/2024 - use left join instead of merge because positions now has symbols
+    # Combine positions with instruments/
+    positions <- dplyr::left_join(instruments, positions)
 
     # Get latest quote
     symbols <- paste(as.character(positions$symbol), collapse = ",")
