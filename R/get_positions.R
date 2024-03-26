@@ -44,7 +44,12 @@ get_positions <- function(RH, limit_output = TRUE) {
 
     ### 3/26/2024 - use left join instead of merge because positions now has symbols
     # Combine positions with instruments/
-    positions <- dplyr::left_join(instruments, positions)
+    sym_chk = 'symbol' %in% colnames(positions)
+    if(sym_chk){
+      positions <- dplyr::left_join(instruments, positions)
+    } else {
+      positions <- cbind(instruments, positions)
+    }
 
     # Get latest quote
     symbols <- paste(as.character(positions$symbol), collapse = ",")
