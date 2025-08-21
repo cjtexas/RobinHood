@@ -105,8 +105,8 @@ RobinHoodUpd <- function(username, password, mfa_code ="NA", totp_code = "NA", a
   
   rhurl = 'https://api.robinhood.com/oauth2/token/'
   headers <- c(Accept = "*/*", 
-               'Content-Type' = "application/json"#,
-               # 'User-Agent'= 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1.1 Safari/605.1.15'
+               'Content-Type' = "application/json",
+               'User-Agent'= 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15'
   )
   dta <- httr::POST(rhurl, body = toJSON(lst,auto_unbox = TRUE),
                     add_headers(headers))
@@ -142,7 +142,7 @@ RobinHoodUpd <- function(username, password, mfa_code ="NA", totp_code = "NA", a
   dta = content(dta)
   RH <- c(api_request = list(grant_type = "password", client_id = "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS", 
                              device_token = uuid::UUIDgenerate(), scope = "internal", 
-                             al_pk = "7F867EDC-C71B-467F-B0A1-8DCBA5D4D2E3"), 
+                             al_pk = "53491f63-997c-4ae6-9bf6-de998a9aa25"), 
           api_response = list(access_token = "000", refresh_token = "000", expires_in = 0, 
                               token_type = "000", scope = "000", mfa_code = "000", backup_code = "000"))
   
