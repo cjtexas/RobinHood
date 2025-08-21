@@ -17,7 +17,7 @@ api_login <- function(username, password, mfa_code) {
       client_id = "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS",
       device_token = uuid::UUIDgenerate(),
       scope = "internal",
-      al_pk = "7F867EDC-C71B-467F-B0A1-8DCBA5D4D2E3"
+      al_pk = "53491f63-997c-4ae6-9bf6-de998a9aa25"
       ),
     api_response = list(
       access_token = "000",
@@ -74,3 +74,4 @@ api_login <- function(username, password, mfa_code) {
 
   return(RH)
 }
+
